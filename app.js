@@ -5,6 +5,7 @@ const cookierParser = require('cookie-Parser');
 const cors = require('cors');
 const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
@@ -19,6 +20,7 @@ if (process.env.NODE_ENV === 'development') {
 // ROUTES
 app.use('/api', blogRoutes);
 app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 
 // Global Errorhandling
 app.use(globalErrorHandler);

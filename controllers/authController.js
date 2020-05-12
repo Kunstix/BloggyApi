@@ -28,11 +28,11 @@ exports.login = catchAsync(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return next(new AppErr('Email is not registered.', 400));
+    return next(new AppErr('Email is not registered.', 401));
   }
 
   if (!user.authenticate(password)) {
-    return next(new AppErr('Wrong password.', 400));
+    return next(new AppErr('Wrong password.', 401));
   }
 
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
@@ -56,6 +56,30 @@ exports.logout = (req, res) => {
   });
 };
 
-exports.isLoggedIn = expressJwt({
+exports.checkToken = expressJwt({
   secret: process.env.JWT_SECRET
+});
+
+exports.isAuthenticated = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById({ _id: userId });
+  if (!user) {
+    return next(AppErr('User not found.', 400));
+  }
+  req.profile = user;
+  next();
+});
+
+exports.isAdminRestricted = catchAsync(async (req, res, next) => {
+  const adminId = req.user._id;
+  const admin = await User.findById({ _id: adminId });
+  if (!admin) {
+    return next(new AppErr('User not found.', 400));
+  }
+
+  if (admin.role !== 1) {
+    return next(new AppErr('Access denied.', 403));
+  }
+  req.profile = admin;
+  next();
 });
