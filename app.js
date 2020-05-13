@@ -6,6 +6,7 @@ const cors = require('cors');
 const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api', blogRoutes);
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', categoryRoutes);
 
 // Global Errorhandling
 app.use(globalErrorHandler);

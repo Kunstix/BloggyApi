@@ -60,7 +60,7 @@ exports.checkToken = expressJwt({
   secret: process.env.JWT_SECRET
 });
 
-exports.isAuthenticated = catchAsync(async (req, res, next) => {
+exports.restrictedToUser = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById({ _id: userId });
   if (!user) {
@@ -70,7 +70,7 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.isAdminRestricted = catchAsync(async (req, res, next) => {
+exports.restrictedToAdmin = catchAsync(async (req, res, next) => {
   const adminId = req.user._id;
   const admin = await User.findById({ _id: adminId });
   if (!admin) {
