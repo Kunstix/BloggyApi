@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { time } = require('../controllers/blogController');
+const { createBlog } = require('../controllers/blogController');
+const {
+  checkToken,
+  restrictedToUser,
+  restrictedToAdmin
+} = require('../controllers/authController');
 
-router.get('/', time);
+router.post('/blogs', checkToken, restrictedToAdmin, createBlog);
 
 module.exports = router;
