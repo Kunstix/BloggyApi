@@ -24,7 +24,9 @@ exports.createBlog = catchAsync(async (req, res, next) => {
       }
       resolve({ ...fields, files });
     });
-  }).catch(err => next(new AppErr('Image could not upload', 400)));
+  }).catch(err => {
+    next(new AppErr('Image could not upload', 400));
+  });
 
   if (!title || !title.length) {
     return next(new AppErr('Title is required.', 400));

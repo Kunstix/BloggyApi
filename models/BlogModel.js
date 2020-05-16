@@ -35,8 +35,8 @@ const blogSchema = new mongoose.Schema(
       data: Buffer,
       contentType: String
     },
-    categories: [{ type: ObjectId, red: 'Category', required: true }],
-    tags: [{ type: ObjectId, red: 'Tag', required: true }],
+    categories: [{ type: ObjectId, ref: 'Category', required: true }],
+    tags: [{ type: ObjectId, ref: 'Tag', required: true }],
     postedBy: {
       type: ObjectId,
       ref: 'User'
@@ -45,4 +45,4 @@ const blogSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('BLog', blogSchema);
+module.exports = mongoose.model('Blog', blogSchema);
