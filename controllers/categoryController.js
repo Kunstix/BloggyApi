@@ -27,9 +27,10 @@ exports.createCategory = catchAsync(async (req, res) => {
 
 exports.deleteCategory = catchAsync(async (req, res) => {
   const slug = req.params.slug.toLowerCase();
-  await Category.deleteOne({ slug });
+  const { deletedCount } = await Category.deleteOne({ slug });
   res.json({
     status: 'success',
+    deletedCount,
     message: 'Category deleted successfully.'
   });
 });
