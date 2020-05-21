@@ -7,7 +7,8 @@ const {
   deleteBlog,
   updateBlog,
   getAllBlogs,
-  getAll
+  getAll,
+  getRelatedBlogs
 } = require('../controllers/blogController');
 const {
   checkToken,
@@ -26,5 +27,6 @@ router
   .get(getAllBlogs)
   .post(checkToken, restrictedToAdmin, createBlog);
 router.post('/blogs-categories-tags', getAll);
+router.post('/blogs/related', getRelatedBlogs);
 
 module.exports = router;

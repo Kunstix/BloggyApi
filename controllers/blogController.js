@@ -17,7 +17,7 @@ exports.getBlog = catchAsync(async (req, res, next) => {
     .populate('tags', '_id name slug')
     .populate('postedBy', '_id name username')
     .select(
-      '_id title slug mtitle mdesc excerpt categories tags postedBy createdAt updatedAt'
+      '_id title body slug mtitle mdesc excerpt categories tags postedBy createdAt updatedAt'
     );
   res.json({
     status: 'success',
@@ -116,7 +116,7 @@ exports.createBlog = catchAsync(async (req, res, next) => {
   blog.title = title;
   blog.body = body;
   blog.slug = slugify(title).toLowerCase();
-  blog.excerpt = smartTrim(body, 320, ' ', ' ...');
+  blog.excerpt = smartTrim(body, 420, ' ', ' ...');
   blog.mtitle = `${title} | ${process.env.APP_NAME}`;
   blog.mdesc = stripHtml(body.substring(0, 160));
   blog.postedBy = req.user._id;
@@ -193,6 +193,32 @@ exports.getAll = catchAsync(async (req, res, next) => {
 exports.getBlogPhoto = catchAsync(async (req, res, next) => {
   const slug = req.params.slug.toLowerCase();
   const blog = await Blog.findOne({ slug });
+  if (!blog) {
+    return next(new AppErr('No image found.', 400));
+  }
   res.set('Content-Type', blog.photo.contentType);
   res.send(blog.photo.data);
+});
+
+exports.getRelatedBlogs = catchAsync(async (req, res, next) => {
+  const limit = req.body.limit ? parseInt(req.body.limit) : 3;
+  const { _id, categories } = req.body.blog;
+
+  const blogs = await Blog.find({
+    _id: { $ne: _id },
+    categories: { $in: categories }
+  })
+    .limit(limit)
+    .populate('postedBy', '_id name profile')
+    .select('title slug excerpt postedBy createdAt updatedAt');
+
+  if (!blogs) {
+    return next(new AppErr('Blogs not found'), 400);
+  }
+
+  res.json({
+    status: 'success',
+    size: blogs.length,
+    data: blogs
+  });
 });
