@@ -5,9 +5,18 @@ const {
   restrictedToUser,
   restrictedToAdmin
 } = require('../controllers/authController');
-const { getProfile } = require('../controllers/userController');
+const {
+  getProfile,
+  getPublicProfile,
+  getProfilePhoto,
+  updateProfile
+} = require('../controllers/userController');
 
-router.get('/profile', checkToken, restrictedToUser, getProfile);
-router.get('/admin', checkToken, restrictedToAdmin, getProfile);
+router
+  .route('/profile')
+  .get(checkToken, restrictedToUser, getProfile)
+  .put(checkToken, restrictedToUser, updateProfile);
+router.get('/users/:username/photo', getProfilePhoto);
+router.get('/users/profile/:username', getPublicProfile);
 
 module.exports = router;

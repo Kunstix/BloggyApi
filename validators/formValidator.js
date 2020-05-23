@@ -1,0 +1,13 @@
+const { check } = require('express-validator');
+
+exports.contactFormValidator = [
+  check('name').not().isEmpty().withMessage('Name is required.'),
+  check('email')
+    .not()
+    .isEmpty()
+    .isEmail()
+    .withMessage('Must be valid email address.'),
+  check('message')
+    .isLength({ min: 20 })
+    .withMessage('Message must have at least 20 characters.')
+];

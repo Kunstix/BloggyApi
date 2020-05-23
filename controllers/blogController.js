@@ -4,6 +4,7 @@ const slugify = require('slugify');
 const _ = require('lodash');
 const stripHtml = require('string-strip-html');
 const Blog = require('../models/BlogModel');
+const User = require('../models/UserModel');
 const Category = require('../models/CategoryModel');
 const Tag = require('../models/TagModel');
 const AppErr = require('../utils/appError');
@@ -209,7 +210,7 @@ exports.getRelatedBlogs = catchAsync(async (req, res, next) => {
     categories: { $in: categories }
   })
     .limit(limit)
-    .populate('postedBy', '_id name profile')
+    .populate('postedBy', '_id name username profile')
     .select('title slug excerpt postedBy createdAt updatedAt');
 
   if (!blogs) {
@@ -220,5 +221,48 @@ exports.getRelatedBlogs = catchAsync(async (req, res, next) => {
     status: 'success',
     size: blogs.length,
     data: blogs
+  });
+});
+
+exports.getSearchedBlogs = catchAsync(async (req, res, next) => {
+  const { search } = req.query;
+  if (search) {
+    const blogs = await Blog.find({
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { body: { $regex: search, $options: 'i' } }
+      ]
+    }).select('-photo -body');
+
+    return res.json({
+      status: 'success',
+      size: blogs.length,
+      blogs
+    });
+  }
+  res.json({
+    status: 'success',
+    size: 0,
+    blogs: []
+  });
+});
+
+exports.getBlogsByUser = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ username: req.params.username });
+
+  if (!user) {
+    return next(new AppErr('No user found', 400));
+  }
+
+  const data = await Blog.find({ postedBy: user._id })
+    .populate('categories', '_id name slug')
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name username')
+    .select('_id title slug postedBy createdAt updatedAt');
+
+  return res.json({
+    status: 'success',
+    size: data.length,
+    data
   });
 });

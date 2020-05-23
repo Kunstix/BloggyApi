@@ -8,14 +8,27 @@ const {
   updateBlog,
   getAllBlogs,
   getAll,
-  getRelatedBlogs
+  getRelatedBlogs,
+  getSearchedBlogs,
+  getBlogsByUser
 } = require('../controllers/blogController');
 const {
   checkToken,
   restrictedToUser,
-  restrictedToAdmin
+  restrictedToAdmin,
+  restrictedToMe
 } = require('../controllers/authController');
 
+// Users
+router.get('/users/blogs/:username', getBlogsByUser);
+router
+  .route('/users/blogs/:slug')
+  .put(checkToken, restrictedToUser, restrictedToMe, updateBlog)
+  .delete(checkToken, restrictedToUser, restrictedToMe, deleteBlog);
+router.post('/users/blogs', checkToken, restrictedToUser, createBlog);
+
+// Admin
+router.get('/blogs/search', getSearchedBlogs);
 router.route('/blogs/:slug/photo').get(getBlogPhoto);
 router
   .route('/blogs/:slug')

@@ -12,7 +12,7 @@ exports.getCategory = catchAsync(async (req, res, next) => {
   const data = await Blog.find({ categories: category })
     .populate('categories', '_id name slug')
     .populate('tags', '_id name slug')
-    .populate('postedBy', '_id name')
+    .populate('postedBy', '_id name username')
     .select(
       '_id title slug excerpt categories postedBy tags createdAt updatedAt'
     );

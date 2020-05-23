@@ -14,3 +14,13 @@ exports.userLoginValidator = [
     .isLength({ min: 10 })
     .withMessage('Password must consist of at least 10 characters')
 ];
+
+exports.emailValidator = [
+  check('email').isEmail().withMessage('Invalid Email.')
+];
+
+exports.passwordValidator = [
+  check('password')
+    .isLength({ min: 10 })
+    .withMessage('Password must consist of at least 10 characters')
+];
