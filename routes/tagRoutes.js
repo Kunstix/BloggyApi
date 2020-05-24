@@ -14,13 +14,13 @@ const {
 } = require('../controllers/authController');
 
 router
-  .route('/tags')
-  .post(tagValidator, validate, checkToken, restrictedToAdmin, createTag)
-  .get(getAllTags);
-
-router
   .route('/tags/:slug')
   .get(getTag)
   .delete(checkToken, restrictedToAdmin, deleteTag);
+
+router
+  .route('/tags')
+  .post(tagValidator, validate, checkToken, restrictedToAdmin, createTag)
+  .get(getAllTags);
 
 module.exports = router;

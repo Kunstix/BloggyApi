@@ -5,6 +5,10 @@ const AppErr = require('../utils/appError');
 const formidable = require('formidable');
 const fs = require('fs');
 const _ = require('lodash');
+const Factory = require('./handlerFactory');
+const APIFeatures = require('../utils/apiFeatures');
+
+exports.getUsers = Factory.getAll(User);
 
 exports.getProfile = (req, res) => {
   req.profile.hashed_password = undefined;
@@ -26,7 +30,6 @@ exports.getPublicProfile = catchAsync(async (req, res, next) => {
     .populate('categories', '_id name slug')
     .populate('tags', '_id name slug')
     .populate('postedBy', '_id name username')
-    .limit(10)
     .select(
       '_id title slug excerpt categories tags postedBy createdAt updatedAt'
     );
@@ -75,6 +78,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     next(new AppErr('Photo could not upload', 400));
   });
 
+  fields.role = undefined;
   const user = _.extend(req.profile, fields);
   if (fields.password && fields.password.length < 8) {
     return next(
@@ -97,4 +101,66 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   updatedUser.hashed_password = undefined;
 
   return res.json({ status: 'success', user: updatedUser });
+});
+
+exports.activateUser = catchAsync(async (req, res, next) => {
+  const username = req.body.username;
+  if (!username) {
+    return next(new AppErr('No valid username', 400));
+  }
+  const { n, nModified, ok } = await User.updateOne(
+    { username },
+    { $set: { active: true } }
+  );
+  if (!n || !nModified || !ok) {
+    return next(new AppErr('User could not be updated', 400));
+  }
+  return res.json({ status: 'success', message: 'User was activated.' });
+});
+
+exports.deactivateUser = catchAsync(async (req, res, next) => {
+  console.log('HERE');
+  const username = req.body.username;
+  if (!username) {
+    return next(new AppErr('No valid username', 400));
+  }
+  console.log(username);
+  const { n, nModified, ok } = await User.updateOne(
+    { username },
+    { $set: { active: false } }
+  );
+  if (!n || !nModified || !ok) {
+    return next(new AppErr("User wasn't updated", 400));
+  }
+  return res.json({ status: 'success', message: 'User was deactivated.' });
+});
+
+exports.promoteUser = catchAsync(async (req, res, next) => {
+  const username = req.body.username;
+  if (!username) {
+    return next(new AppErr('No valid username', 400));
+  }
+  const { n, nModified, ok } = await User.updateOne(
+    { username },
+    { $set: { role: 1 } }
+  );
+  if (!n || !nModified || !ok) {
+    return next(new AppErr('User could not be updated', 400));
+  }
+  return res.json({ status: 'success', message: 'User was promoted.' });
+});
+
+exports.demoteUser = catchAsync(async (req, res, next) => {
+  const username = req.body.username;
+  if (!username) {
+    return next(new AppErr('No valid username', 400));
+  }
+  const { n, nModified, ok } = await User.updateOne(
+    { username },
+    { $set: { role: 0 } }
+  );
+  if (!n || !nModified || !ok) {
+    return next(new AppErr('User could not be updated', 400));
+  }
+  return res.json({ status: 'success', message: 'User was demoted.' });
 });

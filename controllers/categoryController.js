@@ -3,23 +3,32 @@ const catchAsync = require('../utils/catchAsync');
 const AppErr = require('../utils/appError');
 const Category = require('../models/CategoryModel');
 const Blog = require('../models/BlogModel');
+const APIFeatures = require('../utils/apiFeatures');
 const slugify = require('slugify');
 
 exports.getCategory = catchAsync(async (req, res, next) => {
   const slug = req.params.slug.toLowerCase();
   const category = await Category.findOne({ slug });
 
-  const data = await Blog.find({ categories: category })
+  const features = new APIFeatures(
+    Blog.find({ categories: category }),
+    req.query
+  )
+    .paginate()
+    .sort();
+
+  const query = features.query
     .populate('categories', '_id name slug')
     .populate('tags', '_id name slug')
     .populate('postedBy', '_id name username')
     .select(
       '_id title slug excerpt categories postedBy tags createdAt updatedAt'
     );
-
+  const data = await query;
   res.json({
     status: 'success',
     category,
+    size: data.length,
     blogs: data
   });
 });

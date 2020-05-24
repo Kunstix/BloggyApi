@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   preSignup,
   signup,
+  signupWithUser,
   login,
   logout,
   forgotPassword,
@@ -18,6 +19,7 @@ const { validate } = require('../validators');
 
 router.post('/presignup', userSignupValidator, validate, preSignup);
 router.post('/signup', signup);
+router.post('/signupAdmin', signupWithUser);
 router.post('/login', userLoginValidator, validate, login);
 router.get('/logout', logout);
 router.put('/password/forgot', emailValidator, validate, forgotPassword);

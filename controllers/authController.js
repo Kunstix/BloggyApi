@@ -92,6 +92,10 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppErr('Email is not registered.', 401));
   }
 
+  if (!user.active) {
+    return next(new AppErr('User is deactivated.', 401));
+  }
+
   if (!user.authenticate(password)) {
     return next(new AppErr('Wrong password.', 401));
   }

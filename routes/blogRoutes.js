@@ -27,9 +27,13 @@ router
   .delete(checkToken, restrictedToUser, restrictedToMe, deleteBlog);
 router.post('/users/blogs', checkToken, restrictedToUser, createBlog);
 
-// Admin
+// Special
 router.get('/blogs/search', getSearchedBlogs);
+router.get('/blogs-categories-tags', getAll);
+router.post('/blogs/related', getRelatedBlogs);
 router.route('/blogs/:slug/photo').get(getBlogPhoto);
+
+// REST
 router
   .route('/blogs/:slug')
   .get(getBlog)
@@ -39,7 +43,5 @@ router
   .route('/blogs')
   .get(getAllBlogs)
   .post(checkToken, restrictedToAdmin, createBlog);
-router.post('/blogs-categories-tags', getAll);
-router.post('/blogs/related', getRelatedBlogs);
 
 module.exports = router;
