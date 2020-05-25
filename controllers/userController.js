@@ -119,7 +119,6 @@ exports.activateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deactivateUser = catchAsync(async (req, res, next) => {
-  console.log('HERE');
   const username = req.body.username;
   if (!username) {
     return next(new AppErr('No valid username', 400));

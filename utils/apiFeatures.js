@@ -53,7 +53,6 @@ class APIFeatures {
   }
 
   paginate() {
-    console.log(this.queryString);
     // 4) Pagination
     // const page = 2; this.queryString.page * 1 || 1;
     // const limit = this.queryString.limit * 1 || 10;

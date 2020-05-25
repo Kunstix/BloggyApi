@@ -225,6 +225,7 @@ exports.getSearchedBlogs = catchAsync(async (req, res, next) => {
     })
       .limit(limit * 1)
       .skip(skip * 1)
+      .populate('postedBy', 'username')
       .select('-photo -body');
 
     return res.json({
