@@ -6,6 +6,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppErr = require('../utils/appError');
 const Blog = require('../models/BlogModel');
 const mail = require('@sendgrid/mail');
+const { OAuth2Client } = require('google-auth-library');
 const _ = require('lodash');
 mail.setApiKey(process.env.EMAIL_KEY);
 
@@ -111,6 +112,60 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
     user: { _id, username, name, email, role }
   });
+});
+
+const client = new OAuth2Client(process.env.GOOGLE_ID);
+exports.loginWithGoogle = catchAsync(async (req, res, next) => {
+  const idToken = req.body.tokenId;
+  const { payload } = await client.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_ID
+  });
+  const { email_verified, email, jti } = payload;
+  if (email_verified) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      const token = jwt.sign(
+        { _id: existingUser._id },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '1d'
+        }
+      );
+      res.cookie('token', token, { expiresIn: '1d' });
+      const { _id, name, role, username } = existingUser;
+      return res.json({
+        status: 'success',
+        token,
+        user: { _id, email, name, role, username }
+      });
+    } else {
+      const username = shortid.generate();
+      const profile = `${process.env.CLIENT_URL}/profile/${username}`;
+      const password = jti;
+      const name = payload.name;
+      const user = new User({
+        name,
+        email,
+        profile,
+        username,
+        password
+      });
+      const newUser = await user.save();
+      const token = jwt.sign({ _id: newUser._id }, process.env.JWT_SECRET, {
+        expiresIn: '1d'
+      });
+      res.cookie('token', token, { expiresIn: '1d' });
+      const { _id, role } = newUser;
+      return res.json({
+        status: 'success',
+        token,
+        user: { _id, email, name, role, username }
+      });
+    }
+  } else {
+    return next(new AppErr('Google login failed', 401));
+  }
 });
 
 exports.logout = (req, res) => {

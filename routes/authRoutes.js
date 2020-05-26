@@ -5,6 +5,7 @@ const {
   signup,
   signupWithUser,
   login,
+  loginWithGoogle,
   logout,
   forgotPassword,
   resetPassword
@@ -21,6 +22,7 @@ router.post('/presignup', userSignupValidator, validate, preSignup);
 router.post('/signup', signup);
 router.post('/signupAdmin', signupWithUser);
 router.post('/login', userLoginValidator, validate, login);
+router.post('/google-login', loginWithGoogle);
 router.get('/logout', logout);
 router.put('/password/forgot', emailValidator, validate, forgotPassword);
 router.put('/password/reset', passwordValidator, validate, resetPassword);
