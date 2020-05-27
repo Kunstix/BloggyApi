@@ -5,11 +5,16 @@ const app = require('./app');
 
 // DATABASE
 mongoose
-  .connect(process.env.DATABASE_LOCAL, {
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+  .connect(
+    process.env.NODE_ENV === 'development'
+      ? process.env.DATABASE_LOCAL
+      : process.env.DATABASE_CLOUD,
+    {
+      useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  )
   .then(() => console.log('Database connected successfully...'))
   .catch(err => console.log(err));
 
