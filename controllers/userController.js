@@ -78,7 +78,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     next(new AppErr('Photo could not upload', 400));
   });
 
-  fields.role = undefined;
+  fields.role = req.profile.role;
   const user = _.extend(req.profile, fields);
   if (fields.password && fields.password.length < 8) {
     return next(
