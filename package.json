@@ -4,7 +4,8 @@
   "description": "Backend for Bloggy",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "author": "Kunstix",
   "license": "ISC",
