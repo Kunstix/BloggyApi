@@ -117,6 +117,7 @@ exports.login = catchAsync(async (req, res, next) => {
 const client = new OAuth2Client(process.env.GOOGLE_ID);
 exports.loginWithGoogle = catchAsync(async (req, res, next) => {
   const idToken = req.body.tokenId;
+  console.log(idToken);
   const { payload } = await client.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_ID
